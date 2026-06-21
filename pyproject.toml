@@ -1,0 +1,73 @@
+[project]
+name = "polygres"
+version = "0.1.0"
+description = "Python SDK for Polygres"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+authors = [
+  { name = "Polygres" }
+]
+maintainers = [
+  { name = "Polygres", email = "support@evokoa.com" }
+]
+keywords = [
+  "polygres",
+  "postgres",
+  "postgresql",
+  "vector-search",
+  "graph-search",
+  "retrieval",
+  "hybrid-search"
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Topic :: Database",
+  "Topic :: Internet :: WWW/HTTP",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+  "Typing :: Typed"
+]
+dependencies = ["httpx>=0.28.1"]
+
+[project.urls]
+Homepage = "https://polygres.com"
+Documentation = "https://docs.evokoa.com/polygres"
+Repository = "https://github.com/Evokoa/polygres-sdk"
+Issues = "https://github.com/Evokoa/polygres-sdk/issues"
+Support = "mailto:support@evokoa.com"
+
+[project.optional-dependencies]
+dev = [
+  "build>=1.2.2",
+  "hatchling>=1.26.3",
+  "pytest>=8.3.4",
+  "respx>=0.21.1",
+  "ruff>=0.8.4"
+]
+
+[build-system]
+requires = ["hatchling>=1.26.3"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/polygres"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
