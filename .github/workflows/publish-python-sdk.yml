@@ -1,0 +1,99 @@
+name: Publish Python SDK
+
+on:
+  workflow_dispatch:
+    inputs:
+      publish_target:
+        description: Package index to publish to
+        required: true
+        type: choice
+        options:
+          - testpypi
+          - none
+        default: testpypi
+  push:
+    tags:
+      - "python-sdk-v*"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Validate and build SDK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install package and release dependencies
+        run: python -m pip install -e ".[dev]" twine
+
+      - name: Run lint
+        run: python -m ruff check .
+
+      - name: Run tests
+        run: python -m pytest
+
+      - name: Build SDK distribution
+        run: |
+          rm -rf dist
+          python -m build
+          python -m twine check dist/*
+
+      - name: Upload SDK distributions
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-sdk-dist
+          path: dist/*
+          if-no-files-found: error
+
+  publish-testpypi:
+    name: Publish SDK to TestPyPI
+    needs: build
+    if: github.event_name == 'workflow_dispatch' && inputs.publish_target == 'testpypi'
+    runs-on: ubuntu-latest
+    environment:
+      name: testpypi
+      url: https://test.pypi.org/project/polygres/
+    permissions:
+      id-token: write
+    steps:
+      - name: Download SDK distributions
+        uses: actions/download-artifact@v4
+        with:
+          name: python-sdk-dist
+          path: dist/
+
+      - name: Publish to TestPyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+
+  publish-pypi:
+    name: Publish SDK to PyPI
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/python-sdk-v')
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/polygres/
+    permissions:
+      id-token: write
+    steps:
+      - name: Download SDK distributions
+        uses: actions/download-artifact@v4
+        with:
+          name: python-sdk-dist
+          path: dist/
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
