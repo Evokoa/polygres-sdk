@@ -43,7 +43,7 @@ Homepage = "https://polygres.com"
 Documentation = "https://docs.evokoa.com/polygres"
 Repository = "https://github.com/Evokoa/polygres-sdk"
 Issues = "https://github.com/Evokoa/polygres-sdk/issues"
-Support = "mailto:support@evokoa.com"
+Support = "https://polygres.com"
 
 [project.optional-dependencies]
 dev = [
