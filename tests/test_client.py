@@ -132,7 +132,7 @@ def test_headers_and_readiness_model() -> None:
     request = route.calls[0].request
     assert request.headers["Authorization"] == f"Bearer {API_KEY}"
     assert "X-Polygres-Project" not in request.headers
-    assert request.headers["User-Agent"] == "polygres-python/0.1.0"
+    assert request.headers["User-Agent"] == "polygres-python/0.2.0"
     assert readiness.vector["default_config"] == "documents_default"
     assert readiness.request_id == "req_ready"
 
@@ -389,14 +389,72 @@ def test_hybrid_methods_serialize_payloads() -> None:
     graph_page = project.hybrid.graph_first(
         {"schema": "public", "table": "customers", "id": "cus_1"},
         [0.1, 0.2],
+        relationship_types=["placed_by"],
     )
-    project.hybrid.vector_first([0.1, 0.2], vector_limit=20)
-    project.hybrid.joint([0.1, 0.2], {"schema": "public", "table": "customers", "id": "cus_1"})
+    project.hybrid.vector_first(
+        [0.1, 0.2],
+        start={"schema": "public", "table": "customers", "id": "cus_1"},
+        vector_limit=20,
+        relationship_types=["placed_by"],
+        direction="both",
+    )
+    project.hybrid.joint(
+        [0.1, 0.2],
+        {"schema": "public", "table": "customers", "id": "cus_1"},
+        relationship_types=["placed_by"],
+        direction="both",
+        filters={"status": "active"},
+        vector_limit=30,
+    )
 
     assert '"start"' in graph_first.calls[0].request.content.decode()
+    assert '"relationship_types":["placed_by"]' in graph_first.calls[0].request.content.decode()
     assert '"vector_limit":20' in vector_first.calls[0].request.content.decode()
+    assert '"direction":"any"' in vector_first.calls[0].request.content.decode()
     assert '"weights":{"vector":0.7,"graph":0.3}' in joint.calls[0].request.content.decode()
+    assert '"filters":{"status":"active"}' in joint.calls[0].request.content.decode()
+    assert '"vector_limit":30' in joint.calls[0].request.content.decode()
     assert graph_page.results[0].score == 2 / 61
+    assert graph_page.results[0].final_score == 0.024
+    assert graph_page.results[0].vector_rank == 1
+
+
+@ROUTE_CTX
+def test_hybrid_result_score_alias_prefers_final_score() -> None:
+    _stub(
+        respx.post(f"{RUNTIME_URL}/hybrid/joint"),
+        return_value=httpx.Response(
+            200,
+            json={
+                "request_id": "req_hybrid",
+                "mode": "joint",
+                "results": [
+                    {
+                        "node": {"schema": "public", "table": "documents", "id": "doc_1"},
+                        "final_score": 0.024,
+                        "rrf_score": 2 / 61,
+                        "vector_score": 0.8,
+                        "graph_score": 0.5,
+                        "vector_rank": 1,
+                        "graph_rank": 2,
+                        "graph_depth": 1,
+                        "distance": 0.1,
+                        "similarity": 0.9,
+                        "relationships": [],
+                    }
+                ],
+                "next_cursor": None,
+                "has_more": False,
+            },
+        ),
+    )
+
+    page = _client().project().hybrid.joint(
+        [0.1, 0.2],
+        {"schema": "public", "table": "customers", "id": "cus_1"},
+    )
+
+    assert page.results[0].score == 0.024
 
 
 @ROUTE_CTX
@@ -487,8 +545,13 @@ def _hybrid_payload() -> dict[str, object]:
             {
                 "node": {"schema": "public", "table": "documents", "id": "doc_1"},
                 "score": 2 / 61,
+                "final_score": 0.024,
+                "rrf_score": 2 / 61,
                 "vector_score": 0.8,
                 "graph_score": 0.5,
+                "vector_rank": 1,
+                "graph_rank": 2,
+                "graph_depth": 1,
                 "distance": 0.1,
                 "similarity": 0.9,
                 "relationships": [],

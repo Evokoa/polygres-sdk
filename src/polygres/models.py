@@ -267,8 +267,13 @@ class HybridResult:
     id: str
     properties: dict[str, Any]
     score: float
+    final_score: float | None
+    rrf_score: float | None
     vector_score: float | None
     graph_score: float | None
+    vector_rank: int | None
+    graph_rank: int | None
+    graph_depth: int | None
     distance: float | None
     similarity: float | None
     relationships: list[Any]
@@ -276,15 +281,20 @@ class HybridResult:
     @classmethod
     def from_api(cls, payload: dict[str, Any]) -> HybridResult:
         node = payload.get("node", payload)
-        score = payload.get("score", payload.get("rrf_score", 0.0))
+        score = payload.get("score", payload.get("final_score", payload.get("rrf_score", 0.0)))
         return cls(
             schema=node["schema"],
             table=node["table"],
             id=str(node["id"]),
             properties=dict(payload.get("properties", node.get("properties", {}))),
             score=float(score),
+            final_score=payload.get("final_score"),
+            rrf_score=payload.get("rrf_score"),
             vector_score=payload.get("vector_score"),
             graph_score=payload.get("graph_score"),
+            vector_rank=payload.get("vector_rank"),
+            graph_rank=payload.get("graph_rank"),
+            graph_depth=payload.get("graph_depth"),
             distance=payload.get("distance"),
             similarity=payload.get("similarity"),
             relationships=list(payload.get("relationships", [])),

@@ -34,7 +34,7 @@ from polygres.models import (
 API_KEY_RE = re.compile(r"^poly_live_[0-9a-f]{32}$")
 PROJECT_RE = re.compile(r"^p[a-z0-9]{23}$")
 RETRY_STATUSES = {408, 429, 500, 502, 503, 504}
-VERSION = "0.1.0"
+VERSION = "0.2.0"
 
 
 class Polygres:
@@ -76,11 +76,21 @@ class Polygres:
         self._timeout = timeout_config
         self._max_retries = max_retries
         self._headers = headers or {}
+        self._client = httpx.Client(timeout=timeout_config)
 
     def project(self, project_id: str | None = None) -> Project:
         if project_id is not None and not PROJECT_RE.match(project_id):
             raise PolygresValidationError("project id must match ^p[a-z0-9]{23}$")
         return Project(self, project_id)
+
+    def close(self) -> None:
+        self._client.close()
+
+    def __enter__(self) -> Polygres:
+        return self
+
+    def __exit__(self, *exc_info: object) -> None:
+        self.close()
 
     def _headers_for(self) -> dict[str, str]:
         headers = dict(self._headers)
@@ -137,13 +147,13 @@ class Polygres:
         url = f"{self._base_url}{path}"
         for attempt in range(retry_budget + 1):
             try:
-                with httpx.Client(timeout=timeout_config) as client:
-                    response = client.request(
-                        method,
-                        url,
-                        headers=self._headers_for(),
-                        json=json,
-                    )
+                response = self._client.request(
+                    method,
+                    url,
+                    headers=self._headers_for(),
+                    json=json,
+                    timeout=timeout_config,
+                )
             except httpx.TimeoutException as exc:
                 if attempt < retry_budget:
                     _sleep_before_retry(attempt, None)
@@ -495,6 +505,8 @@ class HybridNamespace:
         relationship_types: list[str] | None = None,
         direction: str = "any",
         filters: dict[str, Any] | None = None,
+        vector_weight: float = 0.7,
+        graph_weight: float = 0.3,
         limit: int = 10,
         cursor: str | None = None,
     ) -> Page[HybridResult]:
@@ -511,6 +523,7 @@ class HybridNamespace:
                 "relationship_types": relationship_types,
                 "direction": _sdk_direction(direction),
                 "filters": filters or {},
+                "weights": {"vector": vector_weight, "graph": graph_weight},
                 "limit": limit,
                 "cursor": cursor,
             },
@@ -520,12 +533,15 @@ class HybridNamespace:
         self,
         embedding: list[float],
         *,
+        start: dict[str, Any] | None = None,
         config: str | None = None,
         vector_limit: int = 20,
         max_depth: int = 1,
         relationship_types: list[str] | None = None,
         direction: str = "any",
         filters: dict[str, Any] | None = None,
+        vector_weight: float = 0.7,
+        graph_weight: float = 0.3,
         limit: int = 10,
         cursor: str | None = None,
     ) -> Page[HybridResult]:
@@ -537,12 +553,14 @@ class HybridNamespace:
             "vector-first",
             {
                 "embedding": embedding,
+                "start": start,
                 "config": config,
                 "vector_limit": vector_limit,
                 "max_depth": max_depth,
                 "relationship_types": relationship_types,
                 "direction": _sdk_direction(direction),
                 "filters": filters or {},
+                "weights": {"vector": vector_weight, "graph": graph_weight},
                 "limit": limit,
                 "cursor": cursor,
             },
@@ -557,11 +575,16 @@ class HybridNamespace:
         vector_weight: float = 0.7,
         graph_weight: float = 0.3,
         max_depth: int = 2,
+        relationship_types: list[str] | None = None,
+        direction: str = "any",
+        filters: dict[str, Any] | None = None,
+        vector_limit: int = 20,
         limit: int = 10,
         cursor: str | None = None,
     ) -> Page[HybridResult]:
         _validate_embedding(embedding)
         _validate_range(max_depth, "max_depth", 1, 20)
+        _validate_range(vector_limit, "vector_limit", 1, 1000)
         _validate_range(limit, "limit", 1, 1000)
         return self._hybrid_page(
             "joint",
@@ -571,6 +594,10 @@ class HybridNamespace:
                 "config": config,
                 "weights": {"vector": vector_weight, "graph": graph_weight},
                 "max_depth": max_depth,
+                "relationship_types": relationship_types,
+                "direction": _sdk_direction(direction),
+                "filters": filters or {},
+                "vector_limit": vector_limit,
                 "limit": limit,
                 "cursor": cursor,
             },
