@@ -7,6 +7,7 @@ connections or expose database passwords.
 Links:
 
 - Documentation: https://docs.evokoa.com/polygres
+- Changelog: https://docs.evokoa.com/polygres/changelog
 - Polygres: https://polygres.com
 - Evokoa: https://evokoa.com
 - X: https://x.com/evokoa_ai
