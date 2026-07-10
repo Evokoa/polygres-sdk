@@ -29,6 +29,58 @@ Version `0.1.0` becomes installable from the default package index only after
 the release is published to PyPI. Maintainers validate the same wheel through
 TestPyPI first, following `docs/44-python-sdk-release-runbook.md`.
 
+## Install the Agent Skill
+
+The optional `polygres-cli` Agent Skill helps Codex, Claude Code, and other
+compatible coding agents configure the Polygres project that an SDK application
+uses. The skill operates the separate `polygres` CLI. It does not replace or
+embed the Python SDK.
+
+Install the skill from the public
+[`Evokoa/polygres-skills`](https://github.com/Evokoa/polygres-skills)
+repository:
+
+```bash
+npx skills add Evokoa/polygres-skills --skill polygres-cli
+```
+
+Codex users can instead add the native plugin marketplace:
+
+```bash
+codex plugin marketplace add Evokoa/polygres-skills
+```
+
+Then start Codex, open `/plugins`, and install Polygres. Claude Code users can
+install it inside Claude Code:
+
+```text
+/plugin marketplace add Evokoa/polygres-skills
+/plugin install polygres@polygres
+/reload-plugins
+```
+
+After installation, users can ask the agent to prepare a project for SDK use:
+
+```text
+Set up vector retrieval for documents.embedding, verify readiness, and show me
+the Runtime API connection values my application needs without exposing a
+database password.
+```
+
+The skill does not include the CLI. Install `polygres-cli` separately and run
+`polygres login` before asking the agent to perform project-management tasks.
+
+Update or remove a generic installation with:
+
+```bash
+npx skills update polygres-cli
+npx skills remove --global polygres-cli
+```
+
+See the [Agent Skills guide](https://docs.evokoa.com/polygres/agent-skills)
+for project versus global scope, native Codex and Claude Code updates,
+uninstallation, supported data formats, and security behavior.
+
 ## Quick Start
 
 Create a Polygres API key from your project Settings page. Find the Runtime API
