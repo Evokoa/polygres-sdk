@@ -53,8 +53,8 @@ Publish to PyPI only after the same commit has passed TestPyPI validation. Push
 a release tag from the public repository:
 
 ```bash
-git tag python-sdk-v0.1.0
-git push origin python-sdk-v0.1.0
+git tag polygres-sdk-v0.1.0
+git push origin polygres-sdk-v0.1.0
 ```
 
 The `pypi` GitHub environment must be approved before the upload proceeds.
