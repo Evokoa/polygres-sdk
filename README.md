@@ -17,56 +17,17 @@ Links:
 ## Install
 
 ```bash
-pip install polygres==0.2.0
+pip install polygres-sdk==0.1.0
 ```
 
-For an isolated, globally available `polygres` terminal command, use `pipx`:
+The SDK is a library and does not install a terminal command. Install
+`polygres-cli` separately when you need the `polygres` command for project
+management. Users upgrading from the combined 0.2.x package should install
+`polygres-cli` before upgrading the SDK.
 
-```bash
-pipx install polygres==0.2.0
-polygres --version
-polygres login
-```
-
-Version `0.2.0` becomes installable from the default package index only after
+Version `0.1.0` becomes installable from the default package index only after
 the release is published to PyPI. Maintainers validate the same wheel through
 TestPyPI first, following `docs/44-python-sdk-release-runbook.md`.
-
-## CLI Quick Start
-
-Use the CLI for control-plane and project setup tasks. Use the Python SDK below
-for application retrieval queries against a project's Runtime API.
-
-```bash
-polygres login
-polygres whoami
-polygres projects list
-polygres projects use <project-id-or-exact-name>
-polygres env
-polygres ready
-```
-
-`polygres login` opens the Polygres dashboard for approval and also prints a
-device code for headless terminals. Credentials are saved under
-`~/.config/polygres/config.json` with owner-only permissions on POSIX systems.
-Run `polygres logout` to revoke the refresh token and remove local credentials.
-
-Common setup commands include:
-
-```bash
-polygres import csv ./documents.csv --table documents --wait
-polygres migrations apply --file ./001_create_documents.sql
-polygres graph discover --json > graph.json
-polygres graph config apply --file graph.json
-polygres vector configs list
-polygres text configs list
-```
-
-Run `polygres --help` for the complete supported command surface. Exit codes
-distinguish validation (`2`), authentication (`3`), permission (`4`), not found
-(`5`), conflict (`6`), rate limiting (`7`), remote availability (`8`), and
-missing local tools such as `psql` (`9`). Native database passwords are never
-stored or printed by the CLI.
 
 ## Quick Start
 

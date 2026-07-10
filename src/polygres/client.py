@@ -34,7 +34,7 @@ from polygres.models import (
 API_KEY_RE = re.compile(r"^poly_live_[0-9a-f]{32}$")
 PROJECT_RE = re.compile(r"^p[a-z0-9]{23}$")
 RETRY_STATUSES = {408, 429, 500, 502, 503, 504}
-VERSION = "0.2.0"
+VERSION = "0.1.0"
 
 
 class Polygres:

@@ -132,7 +132,7 @@ def test_headers_and_readiness_model() -> None:
     request = route.calls[0].request
     assert request.headers["Authorization"] == f"Bearer {API_KEY}"
     assert "X-Polygres-Project" not in request.headers
-    assert request.headers["User-Agent"] == "polygres-python/0.2.0"
+    assert request.headers["User-Agent"] == "polygres-python/0.1.0"
     assert readiness.vector["default_config"] == "documents_default"
     assert readiness.request_id == "req_ready"
 
