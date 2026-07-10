@@ -91,7 +91,7 @@ def test_version_and_config_path_json(
 ) -> None:
     rc, out, _ = run_cli(["--version"], capsys, monkeypatch, tmp_path)
     assert rc == 0
-    assert out.strip() == "polygres 0.2.0"
+    assert out.strip() == "polygres 0.2.1"
 
     rc, out, _ = run_cli(["--json", "config", "path"], capsys, monkeypatch, tmp_path)
     assert rc == 0
@@ -428,7 +428,7 @@ def test_projects_list_uses_env_token_and_selected_project_json(
     assert err == ""
     assert route.called
     assert route.calls[0].request.headers["Authorization"] == f"Bearer {ACCESS_TOKEN}"
-    assert route.calls[0].request.headers["User-Agent"] == "polygres-cli/0.2.0"
+    assert route.calls[0].request.headers["User-Agent"] == "polygres-cli/0.2.1"
     assert json.loads(out) == {
         "projects": [{"id": PROJECT_ID, "name": "Support", "status": "ready"}],
         "selected_project_id": PROJECT_ID,
@@ -1799,7 +1799,7 @@ def test_login_browser_fallback_polls_stores_tokens_and_redacts_output(
     assert ACCESS_TOKEN not in out
     assert REFRESH_TOKEN not in out
     assert json.loads(start_route.calls[0].request.content) == {
-        "client": {"name": "polygres-cli", "version": "0.2.0"}
+        "client": {"name": "polygres-cli", "version": "0.2.1"}
     }
     assert json.loads(poll_route.calls[0].request.content) == {
         "login_session_id": "cls_abcdefghijklmnopqrstuvwxyz",

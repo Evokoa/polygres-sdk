@@ -4,6 +4,7 @@ import math
 import random
 import re
 import time
+import warnings
 from dataclasses import dataclass, field
 from typing import Any
 from urllib.parse import urlparse
@@ -34,7 +35,21 @@ from polygres.models import (
 API_KEY_RE = re.compile(r"^poly_live_[0-9a-f]{32}$")
 PROJECT_RE = re.compile(r"^p[a-z0-9]{23}$")
 RETRY_STATUSES = {408, 429, 500, 502, 503, 504}
-VERSION = "0.2.0"
+VERSION = "0.2.1"
+_legacy_warning_emitted = False
+
+
+def _warn_legacy_distribution() -> None:
+    global _legacy_warning_emitted
+    if _legacy_warning_emitted:
+        return
+    warnings.warn(
+        "The 'polygres' distribution is deprecated. Uninstall it and install "
+        "'polygres-sdk' for the Python SDK.",
+        FutureWarning,
+        stacklevel=3,
+    )
+    _legacy_warning_emitted = True
 
 
 class Polygres:
@@ -70,6 +85,8 @@ class Polygres:
             for key, value in headers.items()
         ):
             raise PolygresValidationError("headers must contain string keys and values")
+
+        _warn_legacy_distribution()
 
         self._api_key = api_key
         self._base_url = selected_url.rstrip("/")

@@ -13,7 +13,7 @@ import httpx
 from polygres.cli_errors import AUTH, UNAVAILABLE, CliError, api_error_from_response
 from polygres.cli_secrets import redact_string
 
-VERSION = "0.2.0"
+VERSION = "0.2.1"
 RETRY_STATUSES = {408, 429, 500, 502, 503, 504}
 HEAVY_REQUEST_TIMEOUT = 120.0
 

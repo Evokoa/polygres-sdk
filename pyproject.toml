@@ -1,7 +1,7 @@
 [project]
 name = "polygres"
-version = "0.2.0"
-description = "Python SDK for Polygres"
+version = "0.2.1"
+description = "Deprecated Polygres SDK and CLI; use polygres-sdk and polygres-cli"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "Apache-2.0" }
@@ -21,7 +21,7 @@ keywords = [
   "hybrid-search"
 ]
 classifiers = [
-  "Development Status :: 3 - Alpha",
+  "Development Status :: 7 - Inactive",
   "Intended Audience :: Developers",
   "Operating System :: OS Independent",
   "Programming Language :: Python :: 3",
@@ -47,6 +47,7 @@ Documentation = "https://docs.evokoa.com/polygres"
 Repository = "https://github.com/Evokoa/polygres-sdk"
 Issues = "https://github.com/Evokoa/polygres-sdk/issues"
 Support = "https://polygres.com"
+Migration = "https://docs.evokoa.com/polygres/cli/installation-and-authentication#package-split-migration"
 
 [project.optional-dependencies]
 dev = [

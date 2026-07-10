@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import warnings
+
 import httpx
 import pytest
 import respx
@@ -25,6 +27,20 @@ def _stub(route: object, **kwargs: object) -> object:
 
 def _client() -> Polygres:
     return Polygres(api_key=API_KEY, runtime_url=RUNTIME_URL, max_retries=0)
+
+
+def test_legacy_distribution_warns_once() -> None:
+    client_module._legacy_warning_emitted = False
+
+    with pytest.warns(FutureWarning, match="polygres-sdk"):
+        first = _client()
+    with warnings.catch_warnings(record=True) as subsequent_warnings:
+        warnings.simplefilter("always")
+        second = _client()
+
+    first.close()
+    second.close()
+    assert not subsequent_warnings
 
 
 def _page_payload(cursor: str | None = None) -> dict[str, object]:
@@ -132,7 +148,7 @@ def test_headers_and_readiness_model() -> None:
     request = route.calls[0].request
     assert request.headers["Authorization"] == f"Bearer {API_KEY}"
     assert "X-Polygres-Project" not in request.headers
-    assert request.headers["User-Agent"] == "polygres-python/0.2.0"
+    assert request.headers["User-Agent"] == "polygres-python/0.2.1"
     assert readiness.vector["default_config"] == "documents_default"
     assert readiness.request_id == "req_ready"
 

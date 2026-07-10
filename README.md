@@ -1,4 +1,9 @@
-# Polygres Python SDK
+# Polygres Python SDK and CLI (Deprecated)
+
+> [!WARNING]
+> The `polygres` distribution is deprecated. New SDK users should install
+> `polygres-sdk`; command-line users should install `polygres-cli`. This legacy
+> package receives critical fixes only.
 
 The Polygres SDK is a retrieval client for a per-project Runtime API. It uses a
 Polygres API key and Runtime API URL; it does not open direct Postgres
@@ -17,20 +22,39 @@ Links:
 ## Install
 
 ```bash
-pip install polygres==0.2.0
+pip install polygres==0.2.1
 ```
 
 For an isolated, globally available `polygres` terminal command, use `pipx`:
 
 ```bash
-pipx install polygres==0.2.0
+pipx install polygres==0.2.1
 polygres --version
 polygres login
 ```
 
-Version `0.2.0` becomes installable from the default package index only after
+Version `0.2.1` becomes installable from the default package index only after
 the release is published to PyPI. Maintainers validate the same wheel through
 TestPyPI first, following `docs/44-python-sdk-release-runbook.md`.
+
+## Migrate To The Current Packages
+
+The legacy and current SDK distributions both expose the `polygres` Python
+import namespace. Remove the legacy distribution before installing the current
+SDK:
+
+```bash
+pip uninstall polygres
+pip install polygres-sdk
+```
+
+Install the standalone CLI separately when needed:
+
+```bash
+pip install polygres-cli
+```
+
+Python imports remain `from polygres import Polygres` after migration.
 
 ## CLI Quick Start
 
