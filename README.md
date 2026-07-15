@@ -31,17 +31,17 @@ TestPyPI first, following `docs/44-python-sdk-release-runbook.md`.
 
 ## Install the Agent Skill
 
-The optional `polygres-cli` Agent Skill helps Codex, Claude Code, and other
-compatible coding agents configure the Polygres project that an SDK application
-uses. The skill operates the separate `polygres` CLI. It does not replace or
-embed the Python SDK.
+The optional `polygres-sdk` Agent Skill helps Codex, Claude Code, and other
+compatible coding agents write, test, and troubleshoot retrieval application
+code. The companion `polygres-cli` skill configures the project that an SDK
+application uses. Neither skill embeds its Python package.
 
 Install the skill from the public
 [`Evokoa/polygres-skills`](https://github.com/Evokoa/polygres-skills)
 repository:
 
 ```bash
-npx skills add Evokoa/polygres-skills --skill polygres-cli
+npx skills add Evokoa/polygres-skills --skill polygres-sdk
 ```
 
 Codex users can instead add the native plugin marketplace:
@@ -59,27 +59,28 @@ install it inside Claude Code:
 /reload-plugins
 ```
 
-After installation, users can ask the agent to prepare a project for SDK use:
+After installation, users can ask the agent to build SDK retrieval:
 
 ```text
-Set up vector retrieval for documents.embedding, verify readiness, and show me
-the Runtime API connection values my application needs without exposing a
-database password.
+Use the Polygres SDK to find semantically similar documents, expand their
+citations, and build deduplicated context with source provenance.
 ```
 
-The skill does not include the CLI. Install `polygres-cli` separately and run
-`polygres login` before asking the agent to perform project-management tasks.
+Install `polygres-cli` and the `polygres-cli` skill separately before asking an
+agent to perform project-management or retrieval-configuration tasks.
 
 Update or remove a generic installation with:
 
 ```bash
 npx skills update polygres-cli
-npx skills remove --global polygres-cli
+npx skills update polygres-sdk
+npx skills remove --global polygres-sdk
 ```
 
 See the [Agent Skills guide](https://docs.evokoa.com/polygres/agent-skills)
-for project versus global scope, native Codex and Claude Code updates,
-uninstallation, supported data formats, and security behavior.
+to install `polygres-sdk` for application retrieval guidance or
+`polygres-cli` for project operations. The guide also covers project versus
+global scope, native Codex and Claude Code updates, and security behavior.
 
 ## Quick Start
 
