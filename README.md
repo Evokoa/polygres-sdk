@@ -39,6 +39,13 @@ print(readiness.graph, readiness.vector, readiness.hybrid)
 
 Use the Runtime API URL with the SDK. Do not use a direct or pooled PostgreSQL connection string.
 
+## Agent memory example
+
+For a runnable end-to-end pattern over the Context API, see
+[examples/agent_memory/README.md](examples/agent_memory/README.md). It mirrors
+the pgContext SQL walkthrough for durable decision memory, hybrid retrieval,
+and LLM context-pack assembly.
+
 ## Choose a retrieval method
 
 | Need | Method |

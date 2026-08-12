@@ -1,0 +1,29 @@
+{
+  "name": "agent_memory_decisions",
+  "source": {
+    "mode": "existing",
+    "schema_name": "public",
+    "table_name": "agent_decisions",
+    "source_key_column": "id"
+  },
+  "vector": {
+    "column_name": "embedding",
+    "dimensions": 4,
+    "metric": "cosine"
+  },
+  "text_column": "body",
+  "result_columns": [
+    "summary",
+    "body",
+    "category",
+    "decided_at",
+    "user_id",
+    "tenant_id",
+    "session_id"
+  ],
+  "filter_columns": [
+    "tenant_id",
+    "user_id",
+    "category"
+  ]
+}
