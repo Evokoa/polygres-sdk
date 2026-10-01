@@ -225,7 +225,10 @@ def _is_safe_notice_url(value: str) -> bool:
         or any(ord(character) < 0x20 or ord(character) == 0x7F for character in value)
     ):
         return False
-    parsed = urlparse(value)
+    try:
+        parsed = urlparse(value)
+    except ValueError:
+        return False
     return (
         parsed.scheme == "https"
         and bool(parsed.hostname)

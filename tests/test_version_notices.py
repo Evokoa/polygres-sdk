@@ -78,6 +78,7 @@ def test_parse_version_notice_validates_optional_lifecycle_headers() -> None:
         {**_headers(), SDK_NOTICE_URL_HEADER: "http://docs.polygres.com/releases/sdk"},
         {**_headers(), SDK_NOTICE_URL_HEADER: "https://user:password@docs.polygres.com/sdk"},
         {**_headers(), SDK_NOTICE_URL_HEADER: "https://docs.polygres.com/<unsafe>"},
+        {**_headers(), SDK_NOTICE_URL_HEADER: "https://[docs.polygres.com/releases/sdk"},
     ],
 )
 def test_parse_version_notice_ignores_malformed_or_stale_headers(
@@ -104,6 +105,25 @@ def test_sdk_emits_the_same_notice_only_once_per_process() -> None:
 
     assert len(caught) == 1
     assert route.call_count == 2
+
+
+@ROUTE_CTX
+def test_sdk_malformed_notice_url_does_not_fail_user_request() -> None:
+    respx.get(f"{RUNTIME_URL}/retrieval/readiness").mock(
+        return_value=httpx.Response(
+            200,
+            headers={**_headers(), SDK_NOTICE_URL_HEADER: "https://[docs.polygres.com/sdk"},
+            json=_readiness_payload("req_bad_notice_url"),
+        )
+    )
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("error", PolygresVersionWarning)
+        readiness = (
+            Polygres(api_key=API_KEY, runtime_url=RUNTIME_URL, max_retries=0).project().readiness()
+        )
+
+    assert readiness.request_id == "req_bad_notice_url"
 
 
 @ROUTE_CTX
