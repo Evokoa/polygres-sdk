@@ -119,6 +119,8 @@ def _retry_after_seconds(value: str | None) -> float | None:
         if parsed.tzinfo is None:
             parsed = parsed.replace(tzinfo=timezone.utc)
         seconds = (parsed - datetime.now(timezone.utc)).total_seconds()
+    if not math.isfinite(seconds):
+        return None
     return max(seconds, 0.0)
 
 

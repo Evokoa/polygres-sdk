@@ -1359,6 +1359,27 @@ def test_waiter_adaptive_schedule_stage_reset_retry_after_and_create_result() ->
     assert str(completed.collection_id) == COLLECTION_ID
 
 
+@pytest.mark.parametrize("retry_after", ["nan", "inf", "-inf"])
+def test_waiter_ignores_non_finite_retry_after(retry_after: str) -> None:
+    clock = _Clock()
+    responses = [
+        (_operation(status="running", stage="building_index"), retry_after),
+        (_operation(status="succeeded", stage="ready", collection_id=COLLECTION_ID), None),
+    ]
+
+    completed = wait_for_context_operation(
+        OPERATION_ID,
+        initial=_operation(status="queued", stage="queued"),
+        fetch=lambda _deadline: responses.pop(0),
+        timeout=30,
+        monotonic=clock.monotonic,
+        sleep=clock.sleep,
+    )
+
+    assert clock.delays == [2, 2]
+    assert completed.status == "succeeded"
+
+
 def test_waiter_uses_one_deadline_and_resets_interval_after_stage_change() -> None:
     clock = _Clock()
     stages = ["index"] * 6 + ["verify"] + ["ready"]
